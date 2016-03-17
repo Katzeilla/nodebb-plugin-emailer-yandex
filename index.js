@@ -19,8 +19,8 @@ Emailer.init = function(data, callback) {
 	callback();
 };
 
-Emailer.send = function(data) {
-	var settings = new Settings('emailer-yandex', '0.2.2', {}, function ( ) {
+Emailer.send = function(data, callback) {
+	var settings = new Settings('emailer-yandex', require('./package.json').version, {}, function ( ) {
 		var wrapper = settings.getWrapper(),
 			username = wrapper.username,
 			pass = wrapper.password;
@@ -58,6 +58,7 @@ Emailer.send = function(data) {
 			} else {
 				winston.info('[Yandex Emailer] Sent `' + data.template + '` email to uid ' + data.uid);
 			}
+			callback(err, data);
 		});
 
 	});
