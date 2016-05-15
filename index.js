@@ -8,7 +8,7 @@ var winston = require.main.require('winston'),
 	Emailer = {};
 
 
-Emailer.init = function(data, callback) {
+Emailer.init = function (data, callback) {
 	function renderAdminPage(req, res, next) {
 		res.render('admin/emailers/yandex', {});
 	}
@@ -19,40 +19,45 @@ Emailer.init = function(data, callback) {
 	callback();
 };
 
-Emailer.send = function(data, callback) {
-	var settings = new Settings('emailer-yandex', require('./package.json').version, {}, function ( ) {
+Emailer.send = function (data, callback) {
+	var settings = new Settings('emailer-yandex', require('./package.json').version, {}, function () {
 		var wrapper = settings.getWrapper(),
 			username = wrapper.username,
 			pass = wrapper.password;
 
-		if ( !username || !pass ) {
+		if (!username || !pass) {
 			winston.error('[Yandex Emailer] Username and Password are required but not specified!');
 		}
 
-		if ( 'no-reply@localhost.lan' === data.from ) {
+		if ('no-reply@localhost.lan' === data.from) {
 			winston.error('[Yandex Emailer] "NodeBB ACP > Settings > Email" is required but not specified!');
 		}
 
-		var options = {
+		var transportOptions = {
 			debug: true,
 			host: 'smtp.yandex.ru',
 			port: 465,
 			secure: true,
+			tls: {
+				rejectUnauthorized: false
+			},
 			auth: {
 				user: username,
 				pass: pass
 			}
 		};
 
-		var transport = nodemailer.createTransport(smtpTransport(options));
-
-		transport.sendMail({
+		var mailOptions = {
 			from: data.from,
 			to: data.to,
 			html: data.html,
 			text: data.plaintext,
 			subject: data.subject
-		}, function(err, res) {
+		};
+
+		var transport = nodemailer.createTransport(smtpTransport(transportOptions));
+
+		transport.sendMail(mailOptions, function (err, res) {
 			if (err) {
 				winston.error('[Yandex Emailer] Unable to send `' + data.template + '` email to uid ' + data.uid + '!!' + ' The error: ' + err);
 			} else {
@@ -65,7 +70,7 @@ Emailer.send = function(data, callback) {
 }
 
 Emailer.admin = {
-	menu: function(custom_header, callback) {
+	menu: function (custom_header, callback) {
 		custom_header.plugins.push({
 			"route": '/emailers/yandex',
 			"icon": 'fa-envelope-o',
