@@ -35,9 +35,9 @@ Emailer.send = function (data, callback) {
 
 		var transportOptions = {
 			debug: true,
-			host: 'smtp.yandex.ru',
-			port: 587,
-			secure: false,
+			host: 'smtp.yandex.com',
+			port: 25,
+			secure: true,
 			tls: {
 				rejectUnauthorized: false
 			},
